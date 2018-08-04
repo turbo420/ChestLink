@@ -1,0 +1,8 @@
+api-version: 1.13
+name: ChestLink
+main: link.ChestLink
+version : 1.0
+commands:
+   ChestLink:
+      description: blank
+      usage: /<command>  
