@@ -308,6 +308,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 			List<String> name2 = getConfig().getStringList(player.getName());
 
 			if (name2 != null) {
+
 				for (String admin : name2) {
 
 					String[] locationXYZ = admin.split(";");
