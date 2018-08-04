@@ -29,6 +29,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChestLink extends JavaPlugin implements Listener {
+	private Inventory inv;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -79,8 +80,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 		return false;
 
 	}
-
-	private Inventory inv;
 
 	@Override
 	public void onEnable() {
@@ -182,7 +181,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 						}
 
 						Chest c = (Chest) bs;
-
+						// Checking how many items in chest
 						int itemsnum = 0;
 
 						for (ItemStack chestinv : c.getInventory().getContents()) {
