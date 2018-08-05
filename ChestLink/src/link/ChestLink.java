@@ -176,11 +176,13 @@ public class ChestLink extends JavaPlugin implements Listener {
 						int z = Integer.parseInt(locationXYZ[5]);
 
 						BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
-						if (bs == null) {
+
+						Chest c = (Chest) bs;
+
+						if (c == null) {
 							return;
 						}
 
-						Chest c = (Chest) bs;
 						// Checking how many items in chest
 						int itemsnum = 0;
 
@@ -280,7 +282,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 			if (event.getBlock() == null)
 				return;
-
+			// null on normal chest name // need to fix
 			List<String> list = this.getConfig().getStringList(player.getName());
 
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
@@ -296,7 +298,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockBreak(BlockBreakEvent event) {
-
+		// boolean result = false;
 		if (event.getBlock().getType().equals(Material.CHEST)) {
 			Player player = event.getPlayer();
 
@@ -306,7 +308,11 @@ public class ChestLink extends JavaPlugin implements Listener {
 			int bz = location.getBlockZ();
 
 			List<String> name2 = getConfig().getStringList(player.getName());
-
+			// player.sendMessage(name2.toString());
+			if (name2.toString() == "[]") {
+				event.setCancelled(true);
+				return;
+			}
 			if (name2 != null) {
 
 				for (String admin : name2) {
@@ -315,17 +321,22 @@ public class ChestLink extends JavaPlugin implements Listener {
 					int x = Integer.parseInt(locationXYZ[3]);
 					int y = Integer.parseInt(locationXYZ[4]);
 					int z = Integer.parseInt(locationXYZ[5]);
-
+					if (!(bx == x && by == y && bz == z)) {
+						event.setCancelled(true);
+						// player.sendMessage("cancelled");
+					}
 					if (bx == x && by == y && bz == z) {
+						// result = Boolean.TRUE;
 						name2.remove(admin);
 						getConfig().set(player.getName(), name2);
-
+						// player.sendMessage("in it ");
 						saveConfig();
-
+						event.setCancelled(false);
 						break;
-					}
 
+					}
 				}
+
 			}
 
 		}
