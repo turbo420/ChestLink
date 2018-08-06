@@ -22,18 +22,6 @@ public class Config {
 		}
 	}
 
-	public void SaveConfig(FileConfiguration configfile) {
-		// File locations = new File("plugins/ChestLink", "Chestlocations.yml");
-
-		try {
-			configfile.save(locations);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
 	public void SetConfig(FileConfiguration configfile, String path, List<String> list2) {
 		// File locations = new File("plugins/ChestLink", "locations.yml");
 		configfile.set(path, list2);

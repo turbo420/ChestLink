@@ -2,6 +2,7 @@ package link;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -163,7 +166,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 					e.setCancelled(true);
 
 					///// should redo this a func
-					List<String> list2 = Ba.getStringList(player.getName());
+					List<String> list2 = Ba.getStringList(player.getName() + ".Chest");
 					// Clear the inv every time to update
 					inv.clear();
 
@@ -247,8 +250,8 @@ public class ChestLink extends JavaPlugin implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-		List<String> name2 = Ba.getStringList(p.getName());
-
+		List<String> name2 = Ba.getStringList(p.getName() + ".Chest");
+		// List<String> name2 = Ba.getStringList(player.getName() + ".Chest");
 		String[] locationXYZ = name2.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
 		int y = Integer.parseInt(locationXYZ[4]);
@@ -277,13 +280,12 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 			if (event.getBlock() == null)
 				return;
-			// null on normal chest name // need to fix
 
-			List<String> list = Ba.getStringList(player.getName());
+			List<String> list = Ba.getStringList(player.getName() + ".Chest");
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 
-			dConfig.SetConfig(Ba, player.getName(), list);
+			dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
 
 		}
 
@@ -299,7 +301,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 			int bx = location.getBlockX();
 			int by = location.getBlockY();
 			int bz = location.getBlockZ();
-			List<String> name2 = Ba.getStringList(player.getName());
+			List<String> name2 = Ba.getStringList(player.getName() + ".Chest");
 
 			if (name2.toString() == "[]") {
 				event.setCancelled(true);
@@ -326,7 +328,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 						name2.remove(admin);
 
-						dConfig.SetConfig(Ba, player.getName(), name2);
+						dConfig.SetConfig(Ba, player.getName() + ".Chest", name2);
 
 						event.setCancelled(false);
 						break;
@@ -338,4 +340,17 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 		}
 	}
+
+	@EventHandler
+	public void onExplode(EntityExplodeEvent e) {
+		if (e.getEntityType().equals(EntityType.PRIMED_TNT)) {
+			Iterator<Block> bi = e.blockList().iterator();
+			while (bi.hasNext())
+				if (bi.next().getType() == Material.CHEST) {
+					bi.remove();
+				}
+
+		}
+	}
+
 }
