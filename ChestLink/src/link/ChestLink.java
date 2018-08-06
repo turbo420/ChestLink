@@ -13,6 +13,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,6 +31,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChestLink extends JavaPlugin implements Listener {
 	private Inventory inv;
+	Config dConfig = new Config();
+	FileConfiguration Ba;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -86,27 +89,27 @@ public class ChestLink extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 		createInventory();
 		registerConfig();
-		// initializeItems();
+		dConfig.ConfigMake();
+		Ba = dConfig.LoadConfig();
 
 	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		// Player player = event.getPlayer();
 
-		Player player = event.getPlayer();
-
-		if (player.hasPlayedBefore()) {
-			// player.sendMessage("shit it works!!!");
-			return;
-		} else {
-			//// bug need to see config is null or all ready
-			//// made////////////////
-			List<String> list = this.getConfig().getStringList(player.getName());
-			// list.add(player.getLocation().toString());
-			getConfig().set(player.getName(), list);
-			saveConfig();
-			player.sendMessage("fist time!!!");
-		}
+		// if (player.hasPlayedBefore()) {
+		// player.sendMessage("shit it works!!!");
+		// return;
+		// } else {
+		//// bug need to see config is null or all ready
+		//// made////////////////
+		// List<String> list = this.getConfig().getStringList(player.getName());
+		// list.add(player.getLocation().toString());
+		/// getConfig().set(player.getName(), list);
+		// saveConfig();
+		// player.sendMessage("fist time!!!");
+		// }
 
 	}
 
@@ -156,17 +159,15 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 				if (e.getClickedBlock().getType().equals(Material.CHEST)
 						&& e.getItem().getType().equals(Material.EMERALD)) {
-					// player.sendMessage("I'm a Chest");
 
 					e.setCancelled(true);
-					// Location location = player.getLocation();
 
 					///// should redo this a func
-					List<String> name2 = getConfig().getStringList(player.getName());
+					List<String> list2 = Ba.getStringList(player.getName());
 					// Clear the inv every time to update
 					inv.clear();
 
-					for (String admin : name2) {
+					for (String admin : list2) {
 
 						String[] locationXYZ = admin.split(";");
 						String d = locationXYZ[1];
@@ -246,13 +247,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-
-		List<String> name2 = getConfig().getStringList(p.getName());
-		if (name2 == null) {
-			return;
-		}
-
-		// p.sendMessage(name2.toString());
+		List<String> name2 = Ba.getStringList(p.getName());
 
 		String[] locationXYZ = name2.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
@@ -283,14 +278,12 @@ public class ChestLink extends JavaPlugin implements Listener {
 			if (event.getBlock() == null)
 				return;
 			// null on normal chest name // need to fix
-			List<String> list = this.getConfig().getStringList(player.getName());
 
+			List<String> list = Ba.getStringList(player.getName());
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 
-			getConfig().set(player.getName(), list);
-
-			saveConfig();
+			dConfig.SetConfig(Ba, player.getName(), list);
 
 		}
 
@@ -298,7 +291,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockBreak(BlockBreakEvent event) {
-		// boolean result = false;
+
 		if (event.getBlock().getType().equals(Material.CHEST)) {
 			Player player = event.getPlayer();
 
@@ -306,11 +299,12 @@ public class ChestLink extends JavaPlugin implements Listener {
 			int bx = location.getBlockX();
 			int by = location.getBlockY();
 			int bz = location.getBlockZ();
+			List<String> name2 = Ba.getStringList(player.getName());
 
-			List<String> name2 = getConfig().getStringList(player.getName());
-			// player.sendMessage(name2.toString());
 			if (name2.toString() == "[]") {
 				event.setCancelled(true);
+				player.sendMessage(
+						ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + "You Don't have any Chest");
 				return;
 			}
 			if (name2 != null) {
@@ -323,14 +317,17 @@ public class ChestLink extends JavaPlugin implements Listener {
 					int z = Integer.parseInt(locationXYZ[5]);
 					if (!(bx == x && by == y && bz == z)) {
 						event.setCancelled(true);
-						// player.sendMessage("cancelled");
+						// player.sendMessage(ChatColor.DARK_RED + "[ChestLink]"
+						// + ChatColor.DARK_AQUA
+						// + "You can not break this Chest");
+
 					}
 					if (bx == x && by == y && bz == z) {
-						// result = Boolean.TRUE;
+
 						name2.remove(admin);
-						getConfig().set(player.getName(), name2);
-						// player.sendMessage("in it ");
-						saveConfig();
+
+						dConfig.SetConfig(Ba, player.getName(), name2);
+
 						event.setCancelled(false);
 						break;
 
