@@ -36,6 +36,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 	private Inventory inv;
 	Config dConfig = new Config();
 	FileConfiguration Ba;
+	List<String> list2;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -100,24 +101,13 @@ public class ChestLink extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// Player player = event.getPlayer();
-
-		// if (player.hasPlayedBefore()) {
-		// player.sendMessage("shit it works!!!");
-		// return;
-		// } else {
-		//// bug need to see config is null or all ready
-		//// made////////////////
-		// List<String> list = this.getConfig().getStringList(player.getName());
-		// list.add(player.getLocation().toString());
-		/// getConfig().set(player.getName(), list);
-		// saveConfig();
-		// player.sendMessage("fist time!!!");
-		// }
+		list2 = Ba.getStringList(event.getPlayer().getName() + ".Chest");
 
 	}
 
 	public void createInventory() {
 		inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
+
 	}
 
 	private void registerConfig() {
@@ -162,18 +152,19 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 				if (e.getClickedBlock().getType().equals(Material.CHEST)
 						&& e.getItem().getType().equals(Material.EMERALD)) {
-
+					// Cancelling the chest from opening to open are inventory
 					e.setCancelled(true);
 
 					///// should redo this a func
-					List<String> list2 = Ba.getStringList(player.getName() + ".Chest");
+					// List<String> list2 = Ba.getStringList(player.getName() +
+					///// ".Chest");
 					// Clear the inv every time to update
 					inv.clear();
 
 					for (String admin : list2) {
 
 						String[] locationXYZ = admin.split(";");
-						String d = locationXYZ[1];
+						String Chestname = locationXYZ[1];
 
 						int x = Integer.parseInt(locationXYZ[3]);
 						int y = Integer.parseInt(locationXYZ[4]);
@@ -197,7 +188,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 						}
 
-						inv.addItem(createGuiItem(d,
+						inv.addItem(createGuiItem(Chestname,
 								new ArrayList<String>(Arrays.asList(ChatColor.YELLOW + "ChestLink:",
 										ChatColor.DARK_GREEN + "Number of Items: " + ChatColor.DARK_AQUA
 												+ Integer.toString(itemsnum),
@@ -250,9 +241,9 @@ public class ChestLink extends JavaPlugin implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-		List<String> name2 = Ba.getStringList(p.getName() + ".Chest");
+		// List<String> name2 = Ba.getStringList(p.getName() + ".Chest");
 		// List<String> name2 = Ba.getStringList(player.getName() + ".Chest");
-		String[] locationXYZ = name2.get(e.getSlot()).split(";");
+		String[] locationXYZ = list2.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
 		int y = Integer.parseInt(locationXYZ[4]);
 		int z = Integer.parseInt(locationXYZ[5]);
@@ -281,11 +272,12 @@ public class ChestLink extends JavaPlugin implements Listener {
 			if (event.getBlock() == null)
 				return;
 
-			List<String> list = Ba.getStringList(player.getName() + ".Chest");
-			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
+			// List<String> list = Ba.getStringList(player.getName() +
+			// ".Chest");
+			list2.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
-
-			dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
+			// Setting and saving
+			dConfig.SetConfig(Ba, player.getName() + ".Chest", list2);
 
 		}
 
@@ -301,17 +293,18 @@ public class ChestLink extends JavaPlugin implements Listener {
 			int bx = location.getBlockX();
 			int by = location.getBlockY();
 			int bz = location.getBlockZ();
-			List<String> name2 = Ba.getStringList(player.getName() + ".Chest");
+			// List<String> name2 = Ba.getStringList(player.getName() +
+			// ".Chest");
 
-			if (name2.toString() == "[]") {
+			if (list2.toString() == "[]") {
 				event.setCancelled(true);
 				player.sendMessage(
 						ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + "You Don't have any Chest");
 				return;
 			}
-			if (name2 != null) {
+			if (list2 != null) {
 
-				for (String admin : name2) {
+				for (String admin : list2) {
 
 					String[] locationXYZ = admin.split(";");
 					int x = Integer.parseInt(locationXYZ[3]);
@@ -326,9 +319,9 @@ public class ChestLink extends JavaPlugin implements Listener {
 					}
 					if (bx == x && by == y && bz == z) {
 
-						name2.remove(admin);
+						list2.remove(admin);
 
-						dConfig.SetConfig(Ba, player.getName() + ".Chest", name2);
+						dConfig.SetConfig(Ba, player.getName() + ".Chest", list2);
 
 						event.setCancelled(false);
 						break;
