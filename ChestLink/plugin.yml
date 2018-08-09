@@ -5,4 +5,7 @@ version : 1.0
 commands:
    ChestLink:
       description: blank
-      usage: /<command>  
+      usage: /<command>
+permissions:
+    ChestLink.Make:
+        default: op    

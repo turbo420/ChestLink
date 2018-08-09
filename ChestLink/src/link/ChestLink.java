@@ -46,41 +46,47 @@ public class ChestLink extends JavaPlugin implements Listener {
 			if (sender instanceof Player) {
 				Player player = (Player) sender;
 
-				ItemStack i = new ItemStack(Material.CHEST);
-				ItemStack e = new ItemStack(Material.EMERALD);
-				ItemMeta im = i.getItemMeta();
+				if (player.hasPermission("ChestLink.Make")) {
 
-				if (args.length == 0) {
+					ItemStack i = new ItemStack(Material.CHEST);
+					ItemStack e = new ItemStack(Material.EMERALD);
+					ItemMeta im = i.getItemMeta();
 
-					// im.setDisplayName(ChatColor.RED +
-					// "ChestLock:"+player.getName() +" " + args[0].toString());
-					im.setDisplayName(ChatColor.RED + args[0]);
-				} else if (args.length == 1) {
-					im.setDisplayName(ChatColor.DARK_AQUA + args[0].toString());
-				} else if (args.length == 2) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString());
-				} else if (args.length == 3) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString() + " " + args[2].toString());
-				} else if (args.length == 4) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString() + " " + args[2].toString() + " " + args[3].toString());
+					if (args.length == 0) {
 
-				} else if (args.length == 5) {
+						// im.setDisplayName(ChatColor.RED +
+						// "ChestLock:"+player.getName() +" " +
+						// args[0].toString());
+						im.setDisplayName(ChatColor.RED + args[0]);
+					} else if (args.length == 1) {
+						im.setDisplayName(ChatColor.DARK_AQUA + args[0].toString());
+					} else if (args.length == 2) {
+						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
+								+ " " + args[1].toString());
+					} else if (args.length == 3) {
+						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
+								+ " " + args[1].toString() + " " + args[2].toString());
+					} else if (args.length == 4) {
+						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
+								+ " " + args[1].toString() + " " + args[2].toString() + " " + args[3].toString());
 
-					player.sendMessage("Too many arguments!");
+					} else if (args.length == 5) {
+
+						player.sendMessage("Too many arguments!");
+						return true;
+
+					}
+
+					im.setLore(Arrays.asList(ChatColor.BLUE + "ChestLink", ""));
+					i.setItemMeta(im);
+
+					player.getInventory().setItemInMainHand(i);// getWorld().dropItem(player.getLocation(),
+																// i);
+					player.getInventory().addItem(e);
 					return true;
-
+				} else {
+					player.sendMessage("You Don't have Permissions");
 				}
-
-				im.setLore(Arrays.asList(ChatColor.BLUE + "ChestLink", ""));
-				i.setItemMeta(im);
-
-				player.getInventory().setItemInMainHand(i);// getWorld().dropItem(player.getLocation(),
-															// i);
-				player.getInventory().addItem(e);
-				return true;
 			}
 
 		}
@@ -95,6 +101,8 @@ public class ChestLink extends JavaPlugin implements Listener {
 		registerConfig();
 		dConfig.ConfigMake();
 		Ba = dConfig.LoadConfig();
+		Metric metrics = new Metric(this);
+		metrics.addCustomChart(new Metric.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
 
 	}
 
@@ -155,9 +163,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 					// Cancelling the chest from opening to open are inventory
 					e.setCancelled(true);
 
-					///// should redo this a func
-					// List<String> list2 = Ba.getStringList(player.getName() +
-					///// ".Chest");
 					// Clear the inv every time to update
 					inv.clear();
 
@@ -172,11 +177,11 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 						BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
 
-						Chest c = (Chest) bs;
-
-						if (c == null) {
+						if (bs == null) {
 							return;
 						}
+
+						Chest c = (Chest) bs;
 
 						// Checking how many items in chest
 						int itemsnum = 0;
@@ -241,8 +246,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-		// List<String> name2 = Ba.getStringList(p.getName() + ".Chest");
-		// List<String> name2 = Ba.getStringList(player.getName() + ".Chest");
+
 		String[] locationXYZ = list2.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
 		int y = Integer.parseInt(locationXYZ[4]);
