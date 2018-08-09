@@ -101,6 +101,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 		registerConfig();
 		dConfig.ConfigMake();
 		Ba = dConfig.LoadConfig();
+
 		Metric metrics = new Metric(this);
 		metrics.addCustomChart(new Metric.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
 
@@ -263,7 +264,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 		return;
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent event) {
 
 		if (event.getBlock().getType().equals(Material.CHEST)) {
