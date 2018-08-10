@@ -10,6 +10,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Config {
 	File locations = new File("plugins/ChestLink/", "Chestlocations.yml");
 
+	// private ChestLink plugin = ChestLink.getPlugin(ChestLink.class);
+	// File locations = new File(plugin.getDataFolder(), "Chestlocations.yml");
+
 	public void ConfigMake() {
 		// File locations = new File("plugins/ChestLink/",
 		// "Chestlocations.yml");

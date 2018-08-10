@@ -1,6 +1,5 @@
 package link;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,23 +18,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChestLink extends JavaPlugin implements Listener {
-	private Inventory inv;
+	Inventory inv;
 	Config dConfig = new Config();
 	FileConfiguration Ba;
-	List<String> list2;
+	/// List<String> list2;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -96,8 +92,13 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		getServer().getPluginManager().registerEvents(this, this);
-		createInventory();
+		/// getServer().getPluginManager().registerEvents(this, this);
+		InventoryE inventoryE = new InventoryE(this);
+		PluginManager pluginManager = getServer().getPluginManager();
+		pluginManager.registerEvents(inventoryE, this);
+		pluginManager.registerEvents(this, this);
+
+		inventoryE.createInventory();
 		registerConfig();
 		dConfig.ConfigMake();
 		Ba = dConfig.LoadConfig();
@@ -110,12 +111,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// Player player = event.getPlayer();
-		list2 = Ba.getStringList(event.getPlayer().getName() + ".Chest");
-
-	}
-
-	public void createInventory() {
-		inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
 
 	}
 
@@ -125,145 +120,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
-	// You can call this whenever you want to put the items in
-	public void initializeItems() {
-		inv.addItem(createGuiItem("Example Sword", new ArrayList<String>(Arrays.asList("This is an example!")),
-				Material.DIAMOND_SWORD));
-		inv.addItem(createGuiItem("Example Shovel", new ArrayList<String>(Arrays.asList("This is an example!")),
-				Material.ACACIA_DOOR));
-	}
-
-	// Create a gui item with a custom name, and description
-	public ItemStack createGuiItem(String name, ArrayList<String> desc, Material mat) {
-		ItemStack i = new ItemStack(mat, 1);
-		ItemMeta iMeta = i.getItemMeta();
-		iMeta.setDisplayName(name);
-		iMeta.setLore(desc);
-		i.setItemMeta(iMeta);
-		return i;
-	}
-
-	// You can open the inventory with this
-	public void openInventory(Player p) {
-		p.openInventory(inv);
-		return;
-	}
-
-	@EventHandler
-	public void OnInventory(PlayerInteractEvent e) {
-		Action action = e.getAction();
-		ItemStack iStack = e.getItem();
-		Player player = e.getPlayer();
-		if (action == Action.PHYSICAL || iStack == null || iStack.getType() == Material.AIR)
-			return;
-		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			if (e.getItem() != null && e.getClickedBlock() != null) {
-
-				if (e.getClickedBlock().getType().equals(Material.CHEST)
-						&& e.getItem().getType().equals(Material.EMERALD)) {
-					// Cancelling the chest from opening to open are inventory
-					e.setCancelled(true);
-
-					// Clear the inv every time to update
-					inv.clear();
-
-					for (String admin : list2) {
-
-						String[] locationXYZ = admin.split(";");
-						String Chestname = locationXYZ[1];
-
-						int x = Integer.parseInt(locationXYZ[3]);
-						int y = Integer.parseInt(locationXYZ[4]);
-						int z = Integer.parseInt(locationXYZ[5]);
-
-						BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
-
-						if (bs == null) {
-							return;
-						}
-
-						Chest c = (Chest) bs;
-
-						// Checking how many items in chest
-						int itemsnum = 0;
-
-						for (ItemStack chestinv : c.getInventory().getContents()) {
-							if (chestinv == null)
-								continue;
-							itemsnum += chestinv.getAmount();
-
-						}
-
-						inv.addItem(createGuiItem(Chestname,
-								new ArrayList<String>(Arrays.asList(ChatColor.YELLOW + "ChestLink:",
-										ChatColor.DARK_GREEN + "Number of Items: " + ChatColor.DARK_AQUA
-												+ Integer.toString(itemsnum),
-										ChatColor.DARK_RED + "Chest Location:" + " X:" + x + " Y:" + y + " Z:" + z)),
-								Material.CHEST));
-
-					}
-
-					player.openInventory(inv);
-
-				}
-
-			}
-
-		}
-	}
-
-	// Check for clicks on items
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e) {
-		if (!(e.getWhoClicked() instanceof Player)) {
-			return;
-		}
-
-		String invName = e.getInventory().getName();
-		if (!invName.equals(inv.getName())) {
-			return;
-		}
-
-		e.setCancelled(true);
-
-		Player p = (Player) e.getWhoClicked();
-		ItemStack clickedItem = e.getCurrentItem();
-
-		// What if the clicked item is null? Nullpointer, so return.
-		if (clickedItem == null) {
-			return;
-		}
-
-		// What if the clicked item doesn't have itemmeta? Null pointer, so
-		// return.
-		if (!clickedItem.hasItemMeta()) {
-			return;
-		}
-
-		ItemMeta meta = clickedItem.getItemMeta();
-
-		// What if the clicked item has no display name? Null pointer, so
-		// return.
-		if (!meta.hasDisplayName()) {
-			return;
-		}
-
-		String[] locationXYZ = list2.get(e.getSlot()).split(";");
-		int x = Integer.parseInt(locationXYZ[3]);
-		int y = Integer.parseInt(locationXYZ[4]);
-		int z = Integer.parseInt(locationXYZ[5]);
-
-		BlockState bs = p.getWorld().getBlockAt(x, y, z).getState();
-		if (bs == null) {
-			return;
-		}
-
-		Chest c = (Chest) bs;
-		p.getPlayer().openInventory(c.getInventory());
-
-		return;
-	}
-
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent event) {
 
@@ -271,18 +127,20 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 			Block block = event.getBlockPlaced();
 			Player player = event.getPlayer();
-
-			Chest chest = (Chest) block.getState();
-
-			if (event.getBlock() == null)
+			if (!block.getType().equals(Material.CHEST)) {
+				player.sendMessage("Database needs to reset");
 				return;
-
+			}
+			Chest chest = (Chest) block.getState();
+			List<String> list = Ba.getStringList(event.getPlayer().getName() + ".Chest");
 			// List<String> list = Ba.getStringList(player.getName() +
 			// ".Chest");
-			list2.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
+			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 			// Setting and saving
-			dConfig.SetConfig(Ba, player.getName() + ".Chest", list2);
+			// World arena = Bukkit.getWorld("World");
+			// arena.save();
+			dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
 
 		}
 
@@ -293,23 +151,24 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 		if (event.getBlock().getType().equals(Material.CHEST)) {
 			Player player = event.getPlayer();
-
+			// List<String> list4 = Ba.getStringList(event.getPlayer().getName()
+			// + ".Chest");
 			Location location = event.getBlock().getLocation();
 			int bx = location.getBlockX();
 			int by = location.getBlockY();
 			int bz = location.getBlockZ();
-			// List<String> name2 = Ba.getStringList(player.getName() +
+			// List<String> name5 = Ba.getStringList(player.getName() +
 			// ".Chest");
-
-			if (list2.toString() == "[]") {
+			List<String> list = Ba.getStringList(event.getPlayer().getName() + ".Chest");
+			if (list.toString() == "[]") {
 				event.setCancelled(true);
 				player.sendMessage(
 						ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + "You Don't have any Chest");
 				return;
 			}
-			if (list2 != null) {
+			if (list != null) {
 
-				for (String admin : list2) {
+				for (String admin : list) {
 
 					String[] locationXYZ = admin.split(";");
 					int x = Integer.parseInt(locationXYZ[3]);
@@ -324,10 +183,11 @@ public class ChestLink extends JavaPlugin implements Listener {
 					}
 					if (bx == x && by == y && bz == z) {
 
-						list2.remove(admin);
+						list.remove(admin);
 
-						dConfig.SetConfig(Ba, player.getName() + ".Chest", list2);
-
+						dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
+						// World arena = Bukkit.getWorld("World");
+						// arena.save();
 						event.setCancelled(false);
 						break;
 
