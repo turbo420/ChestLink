@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -26,6 +27,35 @@ public class InventoryE implements Listener {
 
 	public InventoryE(ChestLink plugin) {
 		this.plugin = plugin;
+	}
+
+	public void Fixconfig(Player player) {
+		List<String> list = plugin.Ba.getStringList(player.getName() + ".Chest");
+		for (String admin : list) {
+
+			String[] locationXYZ = admin.split(";");
+			String Chestname = locationXYZ[1];
+
+			int x = Integer.parseInt(locationXYZ[3]);
+			int y = Integer.parseInt(locationXYZ[4]);
+			int z = Integer.parseInt(locationXYZ[5]);
+
+			BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
+
+			if (!bs.getBlock().getType().equals(Material.CHEST)) {
+
+				Location loc = player.getWorld().getBlockAt(x, y, z).getLocation();
+
+				loc.getBlock().setType(Material.CHEST);
+				Chest c = (Chest) loc.getBlock().getState();
+				c.setCustomName(Chestname);
+				c.update();
+
+				player.sendMessage("Database Fixed");
+
+			}
+
+		}
 	}
 
 	// You can open the inventory with this
@@ -101,6 +131,7 @@ public class InventoryE implements Listener {
 
 			if (!bs.getBlock().getType().equals(Material.CHEST)) {
 				player.sendMessage("Database needs to reset");
+
 				return;
 			}
 

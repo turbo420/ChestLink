@@ -31,7 +31,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 	// Inventory inv;
 	Config dConfig = new Config();
 	FileConfiguration Ba;
-	/// List<String> list2;
+	InventoryE inventoryE;
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -84,6 +84,13 @@ public class ChestLink extends JavaPlugin implements Listener {
 				}
 			}
 
+		} else if (cmd.getName().equalsIgnoreCase("Fixconfig")) {
+			if (sender instanceof Player) {
+				Player player = (Player) sender;
+
+				inventoryE.Fixconfig(player);
+				return true;
+			}
 		}
 		return false;
 
@@ -92,7 +99,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		/// getServer().getPluginManager().registerEvents(this, this);
-		InventoryE inventoryE = new InventoryE(this);
+		inventoryE = new InventoryE(this);
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(inventoryE, this);
 		pluginManager.registerEvents(this, this);
@@ -109,7 +116,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		// Player player = event.getPlayer();
 
 	}
 
@@ -132,8 +138,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 			}
 			Chest chest = (Chest) block.getState();
 			List<String> list = Ba.getStringList(event.getPlayer().getName() + ".Chest");
-			// List<String> list = Ba.getStringList(player.getName() +
-			// ".Chest");
+
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 			// Setting and saving
