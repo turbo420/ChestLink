@@ -29,32 +29,37 @@ public class InventoryE implements Listener {
 		this.plugin = plugin;
 	}
 
-	public void Fixconfig(Player player) {
-		List<String> list = plugin.Ba.getStringList(player.getName() + ".Chest");
-		for (String admin : list) {
+	public void FixData(Player player) {
+		if (player.hasPermission("ChestLink.fixdata")) {
+			player.sendMessage(ChatColor.RED + "Running");
+			List<String> list = plugin.Ba.getStringList(player.getName() + ".Chest");
+			for (String admin : list) {
 
-			String[] locationXYZ = admin.split(";");
-			String Chestname = locationXYZ[1];
+				String[] locationXYZ = admin.split(";");
+				String Chestname = locationXYZ[1];
 
-			int x = Integer.parseInt(locationXYZ[3]);
-			int y = Integer.parseInt(locationXYZ[4]);
-			int z = Integer.parseInt(locationXYZ[5]);
+				int x = Integer.parseInt(locationXYZ[3]);
+				int y = Integer.parseInt(locationXYZ[4]);
+				int z = Integer.parseInt(locationXYZ[5]);
 
-			BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
+				BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
 
-			if (!bs.getBlock().getType().equals(Material.CHEST)) {
+				if (!bs.getBlock().getType().equals(Material.CHEST)) {
 
-				Location loc = player.getWorld().getBlockAt(x, y, z).getLocation();
+					Location loc = player.getWorld().getBlockAt(x, y, z).getLocation();
 
-				loc.getBlock().setType(Material.CHEST);
-				Chest c = (Chest) loc.getBlock().getState();
-				c.setCustomName(Chestname);
-				c.update();
+					loc.getBlock().setType(Material.CHEST);
+					Chest c = (Chest) loc.getBlock().getState();
+					c.setCustomName(Chestname);
+					c.update();
 
-				player.sendMessage("Database Fixed");
+					player.sendMessage("Database Fixed");
+
+				}
 
 			}
-
+		} else if (!player.hasPermission("ChestLink.fixdata")) {
+			player.sendMessage(ChatColor.RED + "You do not have Permission to use this");
 		}
 	}
 

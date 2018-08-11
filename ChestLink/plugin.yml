@@ -6,9 +6,11 @@ commands:
    ChestLink:
       description: blank
       usage: /<command>
-   Fixconfig:
+   Fixdata:
       description: blank
       usage: /<command>   
 permissions:
     ChestLink.Make:
       default: op
+    ChestLink.fixdata:
+      default: op 

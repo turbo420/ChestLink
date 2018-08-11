@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -28,7 +29,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChestLink extends JavaPlugin implements Listener {
-	// Inventory inv;
+	ConsoleCommandSender console;
 	Config dConfig = new Config();
 	FileConfiguration Ba;
 	InventoryE inventoryE;
@@ -38,67 +39,88 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 		if (cmd.getName().equalsIgnoreCase("ChestLink") & sender instanceof Player) {
 
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
+			Player player = (Player) sender;
 
-				if (player.hasPermission("ChestLink.Make")) {
+			if (player.hasPermission("ChestLink.Make")) {
 
-					ItemStack i = new ItemStack(Material.CHEST);
-					ItemStack e = new ItemStack(Material.EMERALD);
-					ItemMeta im = i.getItemMeta();
+				ItemStack i = new ItemStack(Material.CHEST);
+				ItemStack e = new ItemStack(Material.EMERALD);
+				ItemMeta im = i.getItemMeta();
 
-					if (args.length == 0) {
+				if (args.length == 0) {
 
-						// im.setDisplayName(ChatColor.RED +
-						// "ChestLock:"+player.getName() +" " +
-						// args[0].toString());
-						im.setDisplayName(ChatColor.RED + args[0]);
-					} else if (args.length == 1) {
-						im.setDisplayName(ChatColor.DARK_AQUA + args[0].toString());
-					} else if (args.length == 2) {
-						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
-								+ " " + args[1].toString());
-					} else if (args.length == 3) {
-						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
-								+ " " + args[1].toString() + " " + args[2].toString());
-					} else if (args.length == 4) {
-						im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString()
-								+ " " + args[1].toString() + " " + args[2].toString() + " " + args[3].toString());
+					// im.setDisplayName(ChatColor.RED +
+					// "ChestLock:"+player.getName() +" " +
+					// args[0].toString());
+					im.setDisplayName(ChatColor.RED + args[0]);
+				} else if (args.length == 1) {
+					im.setDisplayName(ChatColor.DARK_AQUA + args[0].toString());
+				} else if (args.length == 2) {
+					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
+							+ args[1].toString());
+				} else if (args.length == 3) {
+					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
+							+ args[1].toString() + " " + args[2].toString());
+				} else if (args.length == 4) {
+					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
+							+ args[1].toString() + " " + args[2].toString() + " " + args[3].toString());
 
-					} else if (args.length == 5) {
+				} else if (args.length == 5) {
 
-						player.sendMessage("Too many arguments!");
-						return true;
-
-					}
-
-					im.setLore(Arrays.asList(ChatColor.BLUE + "ChestLink", ""));
-					i.setItemMeta(im);
-
-					player.getInventory().setItemInMainHand(i);// getWorld().dropItem(player.getLocation(),
-																// i);
-					player.getInventory().addItem(e);
+					player.sendMessage("Too many arguments!");
 					return true;
-				} else {
-					player.sendMessage("You Don't have Permissions");
+
 				}
-			}
 
-		} else if (cmd.getName().equalsIgnoreCase("Fixconfig")) {
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
+				im.setLore(Arrays.asList(ChatColor.BLUE + "ChestLink", ""));
+				i.setItemMeta(im);
 
-				inventoryE.Fixconfig(player);
+				player.getInventory().setItemInMainHand(i);// getWorld().dropItem(player.getLocation(),
+															// i);
+				player.getInventory().addItem(e);
 				return true;
+			} else {
+				player.sendMessage("You Don't have Permissions");
 			}
+
+		} else if (cmd.getName().equalsIgnoreCase("Fixdata") & sender instanceof Player) {
+
+			Player player = (Player) sender;
+
+			inventoryE.FixData(player);
+			return true;
 		}
+
 		return false;
 
 	}
 
 	@Override
+	public void onLoad() {
+		console = Bukkit.getServer().getConsoleSender();
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "----------Loading--------------");
+		console.sendMessage(ChatColor.GREEN + "---------ChestLink-------------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+
+	}
+
+	@Override
+	public void onDisable() {
+
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "-----------Disabling-----------");
+		console.sendMessage(ChatColor.GREEN + "-----------ChestLink-----------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+	}
+
+	@Override
 	public void onEnable() {
-		/// getServer().getPluginManager().registerEvents(this, this);
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "----------ChestLink------------");
+		console.sendMessage(ChatColor.GREEN + "---------Version 1.0-----------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+
 		inventoryE = new InventoryE(this);
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(inventoryE, this);
@@ -109,8 +131,10 @@ public class ChestLink extends JavaPlugin implements Listener {
 		dConfig.ConfigMake();
 		Ba = dConfig.LoadConfig();
 
+		@SuppressWarnings("unused")
 		Metric metrics = new Metric(this);
-		metrics.addCustomChart(new Metric.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
+		// metrics.addCustomChart(new Metric.SimplePie("players", () ->
+		// Bukkit.getOnlinePlayers().size()));
 
 	}
 
