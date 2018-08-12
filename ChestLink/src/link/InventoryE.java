@@ -16,7 +16,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,33 +34,33 @@ public class InventoryE implements Listener {
 		return;
 	}
 
-	public void createInventory() {
-		// inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
-
-	}
-
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		// createInventory1(event.getPlayer());
-	}
-
 	public void createInventory1(Player player) {
-		player.sendMessage("Running");
+		///////////////////////// NEED BIG CODE
+		///////////////////////// REWORK////////////////////////////////////////////////////
 		List<String> list = plugin.customConfig.getStringList(player.getPlayer().getName() + ".Chest");
 		if (list.toString() == "[]" || list.isEmpty()) {
+			// player.sendMessage("Running");
 			inv = Bukkit.createInventory(null, 9, ChatColor.RED + "ChestLink");
-		} else if (list.size() < 9) {
+			return;
+		}
+		if (list.size() < 9) {
 			inv = Bukkit.createInventory(null, 9, ChatColor.RED + "ChestLink");
+			return;
 		} else if (list.size() < 18) {
 			inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
+			return;
 		} else if (list.size() < 27) {
 			inv = Bukkit.createInventory(null, 27, ChatColor.RED + "ChestLink");
+			return;
 		} else if (list.size() < 36) {
 			inv = Bukkit.createInventory(null, 36, ChatColor.RED + "ChestLink");
+			return;
 		} else if (list.size() < 45) {
 			inv = Bukkit.createInventory(null, 45, ChatColor.RED + "ChestLink");
-		} else if (list.size() < 54) {
+			return;
+		} else if (list.size() < 55) {
 			inv = Bukkit.createInventory(null, 54, ChatColor.RED + "ChestLink");
+			return;
 		}
 	}
 

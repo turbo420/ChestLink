@@ -206,18 +206,19 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
 			// check to see if we are not making more the 54 chests
-			// if (list.size() > 54) {
-			// player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" +
-			// ChatColor.DARK_AQUA
-			// + "You can't make anymore linked chest");
-			// event.setCancelled(true);
-			// return;
-			// }
+			if (list.size() == 54) {
+				player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA
+						+ "You can't make anymore linked chest");
+				event.setCancelled(true);
 
-			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
-					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
+			}
+			if (list.size() < 54 || list.isEmpty()) {
 
-			dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
+				list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
+						+ block.getX() + ";" + block.getY() + ";" + block.getZ());
+
+				dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
+			}
 
 		}
 
