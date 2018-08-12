@@ -208,9 +208,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
-			// Setting and saving
-			// World arena = Bukkit.getWorld("World");
-			// arena.save();
+
 			dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
 
 		}
