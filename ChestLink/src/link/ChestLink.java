@@ -174,6 +174,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	private void registerConfig() {
 		saveDefaultConfig();
+
 		// getConfig().options().copyDefaults(true);
 		// saveConfig();
 	}
@@ -191,7 +192,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 			Block block = event.getBlockPlaced();
 
 			if (!block.getType().equals(Material.CHEST)) {
-				player.sendMessage("Database needs to reset");
+				player.sendMessage("Database needs to reset again");
 				return;
 			}
 			Chest chest = (Chest) block.getState();
