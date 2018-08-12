@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,8 +36,33 @@ public class InventoryE implements Listener {
 	}
 
 	public void createInventory() {
-		inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
+		// inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
 
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		// createInventory1(event.getPlayer());
+	}
+
+	public void createInventory1(Player player) {
+		player.sendMessage("Running");
+		List<String> list = plugin.customConfig.getStringList(player.getPlayer().getName() + ".Chest");
+		if (list.toString() == "[]" || list.isEmpty()) {
+			inv = Bukkit.createInventory(null, 9, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 9) {
+			inv = Bukkit.createInventory(null, 9, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 18) {
+			inv = Bukkit.createInventory(null, 18, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 27) {
+			inv = Bukkit.createInventory(null, 27, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 36) {
+			inv = Bukkit.createInventory(null, 36, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 45) {
+			inv = Bukkit.createInventory(null, 45, ChatColor.RED + "ChestLink");
+		} else if (list.size() < 54) {
+			inv = Bukkit.createInventory(null, 54, ChatColor.RED + "ChestLink");
+		}
 	}
 
 	// You can call this whenever you want to put the items in
@@ -66,11 +92,13 @@ public class InventoryE implements Listener {
 			return;
 		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (e.getItem() != null && e.getClickedBlock() != null) {
-				// gets the tool fron config file
+				// gets the tool from Config file
 				String ChestTool = plugin.getConfig().getString("ChestTool").toUpperCase();
 
 				if (e.getClickedBlock().getType().equals(Material.CHEST)
 						&& e.getItem().getType().equals(Material.getMaterial(ChestTool))) {
+
+					createInventory1(player);
 
 					// we have to Cancelled it then call Chestlink inventory
 					// EMERALD
@@ -86,6 +114,7 @@ public class InventoryE implements Listener {
 
 	@EventHandler
 	public void onInventoryOpen(InventoryOpenEvent e) {
+
 		if (e.getInventory().getName().equals("Chest") || e.getInventory().getName().equals("Large Chest")) {
 
 			// player.sendMessage("Normal CHEST");
@@ -93,7 +122,7 @@ public class InventoryE implements Listener {
 			return;
 		}
 		Player player = (Player) e.getPlayer();
-
+		// createInventory1(player);
 		inv.clear();
 		List<String> list = plugin.customConfig.getStringList(e.getPlayer().getName() + ".Chest");
 		for (String admin : list) {

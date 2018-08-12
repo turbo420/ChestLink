@@ -66,7 +66,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 		pluginManager.registerEvents(inventoryE, this);
 		pluginManager.registerEvents(this, this);
 
-		inventoryE.createInventory();
+		// inventoryE.createInventory();
 		registerConfig();
 		dConfig.ConfigMake();
 		customConfig = dConfig.LoadConfig();
@@ -205,6 +205,14 @@ public class ChestLink extends JavaPlugin implements Listener {
 			}
 
 			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
+			// check to see if we are not making more the 54 chests
+			// if (list.size() > 54) {
+			// player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" +
+			// ChatColor.DARK_AQUA
+			// + "You can't make anymore linked chest");
+			// event.setCancelled(true);
+			// return;
+			// }
 
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
@@ -262,6 +270,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 						list.remove(admin);
 
+						// player.sendMessage(String.valueOf(list.size()));
 						dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
 						// World arena = Bukkit.getWorld("World");
 						// arena.save();
