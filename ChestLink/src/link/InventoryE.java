@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -27,41 +26,6 @@ public class InventoryE implements Listener {
 
 	public InventoryE(ChestLink plugin) {
 		this.plugin = plugin;
-	}
-
-	public void FixDataBase(Player player) {
-		if (player.hasPermission("ChestLink.FixDataBase")) {
-			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Running FixDataBase");
-			List<String> list = plugin.customConfig.getStringList(player.getName() + ".Chest");
-			for (String admin : list) {
-
-				String[] locationXYZ = admin.split(";");
-				String Chestname = locationXYZ[1];
-
-				int x = Integer.parseInt(locationXYZ[3]);
-				int y = Integer.parseInt(locationXYZ[4]);
-				int z = Integer.parseInt(locationXYZ[5]);
-
-				BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
-
-				if (!bs.getBlock().getType().equals(Material.CHEST)) {
-
-					Location loc = player.getWorld().getBlockAt(x, y, z).getLocation();
-
-					loc.getBlock().setType(Material.CHEST);
-					Chest c = (Chest) loc.getBlock().getState();
-					c.setCustomName(Chestname);
-					c.update();
-
-					player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Database Fixed");
-
-				}
-
-			}
-		} else if (!player.hasPermission("ChestLink.FixDataBase")) {
-			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_RED
-					+ " You do not have Permission to use this");
-		}
 	}
 
 	// You can open the inventory with this

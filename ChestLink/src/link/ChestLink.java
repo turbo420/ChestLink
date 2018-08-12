@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,6 +34,53 @@ public class ChestLink extends JavaPlugin implements Listener {
 	Config dConfig = new Config();
 	FileConfiguration customConfig;
 	InventoryE inventoryE;
+
+	@Override
+	public void onLoad() {
+		console = Bukkit.getServer().getConsoleSender();
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "----------Loading--------------");
+		console.sendMessage(ChatColor.GREEN + "---------ChestLink-------------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+
+	}
+
+	@Override
+	public void onDisable() {
+
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "-----------Disabling-----------");
+		console.sendMessage(ChatColor.GREEN + "-----------ChestLink-----------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+	}
+
+	@Override
+	public void onEnable() {
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+		console.sendMessage(ChatColor.GREEN + "----------ChestLink------------");
+		console.sendMessage(ChatColor.GREEN + "---------Version 1.0-----------");
+		console.sendMessage(ChatColor.RED + "-------------------------------");
+
+		inventoryE = new InventoryE(this);
+		PluginManager pluginManager = getServer().getPluginManager();
+		pluginManager.registerEvents(inventoryE, this);
+		pluginManager.registerEvents(this, this);
+
+		inventoryE.createInventory();
+		registerConfig();
+		dConfig.ConfigMake();
+		customConfig = dConfig.LoadConfig();
+
+		Metric metrics = new Metric(this);
+
+		metrics.addCustomChart(new Metric.SingleLineChart("play", () -> Bukkit.getOnlinePlayers().size()));
+
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -86,7 +134,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 				return true;
 			}
 
-			inventoryE.FixDataBase(player);
+			FixDataBase(player);
 			return true;
 		}
 
@@ -94,51 +142,39 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	}
 
-	@Override
-	public void onLoad() {
-		console = Bukkit.getServer().getConsoleSender();
-		console.sendMessage(ChatColor.RED + "-------------------------------");
-		console.sendMessage(ChatColor.GREEN + "----------Loading--------------");
-		console.sendMessage(ChatColor.GREEN + "---------ChestLink-------------");
-		console.sendMessage(ChatColor.RED + "-------------------------------");
+	public void FixDataBase(Player player) {
+		if (player.hasPermission("ChestLink.FixDataBase")) {
+			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Running FixDataBase");
+			List<String> list = customConfig.getStringList(player.getName() + ".Chest");
+			for (String admin : list) {
 
-	}
+				String[] locationXYZ = admin.split(";");
+				String Chestname = locationXYZ[1];
 
-	@Override
-	public void onDisable() {
+				int x = Integer.parseInt(locationXYZ[3]);
+				int y = Integer.parseInt(locationXYZ[4]);
+				int z = Integer.parseInt(locationXYZ[5]);
 
-		console.sendMessage(ChatColor.RED + "-------------------------------");
-		console.sendMessage(ChatColor.GREEN + "-----------Disabling-----------");
-		console.sendMessage(ChatColor.GREEN + "-----------ChestLink-----------");
-		console.sendMessage(ChatColor.RED + "-------------------------------");
-	}
+				BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
 
-	@Override
-	public void onEnable() {
-		console.sendMessage(ChatColor.RED + "-------------------------------");
-		console.sendMessage(ChatColor.GREEN + "----------ChestLink------------");
-		console.sendMessage(ChatColor.GREEN + "---------Version 1.0-----------");
-		console.sendMessage(ChatColor.RED + "-------------------------------");
+				if (!bs.getBlock().getType().equals(Material.CHEST)) {
 
-		inventoryE = new InventoryE(this);
-		PluginManager pluginManager = getServer().getPluginManager();
-		pluginManager.registerEvents(inventoryE, this);
-		pluginManager.registerEvents(this, this);
+					Location loc = player.getWorld().getBlockAt(x, y, z).getLocation();
 
-		inventoryE.createInventory();
-		registerConfig();
-		dConfig.ConfigMake();
-		customConfig = dConfig.LoadConfig();
+					loc.getBlock().setType(Material.CHEST);
+					Chest c = (Chest) loc.getBlock().getState();
+					c.setCustomName(Chestname);
+					c.update();
 
-		Metric metrics = new Metric(this);
+					player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Database Fixed");
 
-		metrics.addCustomChart(new Metric.SingleLineChart("play", () -> Bukkit.getOnlinePlayers().size()));
+				}
 
-	}
-
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-
+			}
+		} else if (!player.hasPermission("ChestLink.FixDataBase")) {
+			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_RED
+					+ " You do not have Permission to use this");
+		}
 	}
 
 	private void registerConfig() {
