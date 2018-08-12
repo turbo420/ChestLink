@@ -1,3 +1,4 @@
 #Version 1.0
-
+# Changes the Chest tool that opens the Chest inventory like STICK WOOD_SPADE EMERALD
+ChestTool: EMERALD
 

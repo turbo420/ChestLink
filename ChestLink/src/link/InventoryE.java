@@ -29,10 +29,10 @@ public class InventoryE implements Listener {
 		this.plugin = plugin;
 	}
 
-	public void FixData(Player player) {
-		if (player.hasPermission("ChestLink.fixdata")) {
-			player.sendMessage(ChatColor.RED + "Running");
-			List<String> list = plugin.Ba.getStringList(player.getName() + ".Chest");
+	public void FixDataBase(Player player) {
+		if (player.hasPermission("ChestLink.FixDataBase")) {
+			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Running FixDataBase");
+			List<String> list = plugin.customConfig.getStringList(player.getName() + ".Chest");
 			for (String admin : list) {
 
 				String[] locationXYZ = admin.split(";");
@@ -53,13 +53,14 @@ public class InventoryE implements Listener {
 					c.setCustomName(Chestname);
 					c.update();
 
-					player.sendMessage("Database Fixed");
+					player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Database Fixed");
 
 				}
 
 			}
-		} else if (!player.hasPermission("ChestLink.fixdata")) {
-			player.sendMessage(ChatColor.RED + "You do not have Permission to use this");
+		} else if (!player.hasPermission("ChestLink.FixDataBase")) {
+			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_RED
+					+ " You do not have Permission to use this");
 		}
 	}
 
@@ -101,11 +102,14 @@ public class InventoryE implements Listener {
 			return;
 		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (e.getItem() != null && e.getClickedBlock() != null) {
+				// gets the tool fron config file
+				String ChestTool = plugin.getConfig().getString("ChestTool").toUpperCase();
 
 				if (e.getClickedBlock().getType().equals(Material.CHEST)
-						&& e.getItem().getType().equals(Material.EMERALD)) {
+						&& e.getItem().getType().equals(Material.getMaterial(ChestTool))) {
 
 					// we have to Cancelled it then call Chestlink inventory
+					// EMERALD
 					e.setCancelled(true);
 					player.openInventory(inv);
 				}
@@ -118,11 +122,16 @@ public class InventoryE implements Listener {
 
 	@EventHandler
 	public void onInventoryOpen(InventoryOpenEvent e) {
+		if (e.getInventory().getName().equals("Chest") || e.getInventory().getName().equals("Large Chest")) {
 
+			// player.sendMessage("Normal CHEST");
+			e.setCancelled(false);
+			return;
+		}
 		Player player = (Player) e.getPlayer();
 
 		inv.clear();
-		List<String> list = plugin.Ba.getStringList(e.getPlayer().getName() + ".Chest");
+		List<String> list = plugin.customConfig.getStringList(e.getPlayer().getName() + ".Chest");
 		for (String admin : list) {
 
 			String[] locationXYZ = admin.split(";");
@@ -135,7 +144,8 @@ public class InventoryE implements Listener {
 			BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
 
 			if (!bs.getBlock().getType().equals(Material.CHEST)) {
-				player.sendMessage("Database needs to reset");
+				player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA
+						+ " Database needs to reset." + ChatColor.RED + " Use /FixDataBase to fix Database");
 
 				return;
 			}
@@ -197,7 +207,7 @@ public class InventoryE implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-		List<String> list3 = plugin.Ba.getStringList(e.getWhoClicked().getName() + ".Chest");
+		List<String> list3 = plugin.customConfig.getStringList(e.getWhoClicked().getName() + ".Chest");
 		String[] locationXYZ = list3.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
 		int y = Integer.parseInt(locationXYZ[4]);
@@ -205,7 +215,8 @@ public class InventoryE implements Listener {
 
 		BlockState bs = player.getWorld().getBlockAt(x, y, z).getState();
 		if (!bs.getBlock().getType().equals(Material.CHEST)) {
-			player.sendMessage("Database needs to reset");
+			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Database needs to reset."
+					+ ChatColor.RED + " Use /FixDataBase to fix Database");
 			return;
 		}
 

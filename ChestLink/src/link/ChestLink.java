@@ -31,7 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ChestLink extends JavaPlugin implements Listener {
 	ConsoleCommandSender console;
 	Config dConfig = new Config();
-	FileConfiguration Ba;
+	FileConfiguration customConfig;
 	InventoryE inventoryE;
 
 	@Override
@@ -48,28 +48,24 @@ public class ChestLink extends JavaPlugin implements Listener {
 				ItemMeta im = i.getItemMeta();
 
 				if (args.length == 0) {
-
-					// im.setDisplayName(ChatColor.RED +
-					// "ChestLock:"+player.getName() +" " +
-					// args[0].toString());
-					im.setDisplayName(ChatColor.RED + args[0]);
+					player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Need a Chest name");
+					return true;
 				} else if (args.length == 1) {
 					im.setDisplayName(ChatColor.DARK_AQUA + args[0].toString());
+
 				} else if (args.length == 2) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString());
-				} else if (args.length == 3) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString() + " " + args[2].toString());
-				} else if (args.length == 4) {
-					im.setDisplayName(ChatColor.RED + "ChestLock:" + player.getName() + " " + args[0].toString() + " "
-							+ args[1].toString() + " " + args[2].toString() + " " + args[3].toString());
 
-				} else if (args.length == 5) {
-
-					player.sendMessage("Too many arguments!");
+					player.sendMessage(
+							ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Too many arguments!");
 					return true;
 
+				}
+
+				if (args[0].toString().equalsIgnoreCase("Chest")) {
+
+					player.sendMessage(
+							ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Can't use the name Chest ");
+					return true;
 				}
 
 				im.setLore(Arrays.asList(ChatColor.BLUE + "ChestLink", ""));
@@ -80,14 +76,17 @@ public class ChestLink extends JavaPlugin implements Listener {
 				player.getInventory().addItem(e);
 				return true;
 			} else {
-				player.sendMessage("You Don't have Permissions");
+				player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + " You Don't have Permissions");
 			}
 
-		} else if (cmd.getName().equalsIgnoreCase("Fixdata") & sender instanceof Player) {
-
+		} else if (cmd.getName().equalsIgnoreCase("FixDataBase") & sender instanceof Player) {
 			Player player = (Player) sender;
+			if (args.length > 0) {
+				player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " No arguments needed!");
+				return true;
+			}
 
-			inventoryE.FixData(player);
+			inventoryE.FixDataBase(player);
 			return true;
 		}
 
@@ -129,12 +128,11 @@ public class ChestLink extends JavaPlugin implements Listener {
 		inventoryE.createInventory();
 		registerConfig();
 		dConfig.ConfigMake();
-		Ba = dConfig.LoadConfig();
+		customConfig = dConfig.LoadConfig();
 
-		@SuppressWarnings("unused")
 		Metric metrics = new Metric(this);
-		// metrics.addCustomChart(new Metric.SimplePie("players", () ->
-		// Bukkit.getOnlinePlayers().size()));
+
+		metrics.addCustomChart(new Metric.SingleLineChart("play", () -> Bukkit.getOnlinePlayers().size()));
 
 	}
 
@@ -144,31 +142,39 @@ public class ChestLink extends JavaPlugin implements Listener {
 	}
 
 	private void registerConfig() {
-
-		getConfig().options().copyDefaults(false);
-		saveConfig();
+		saveDefaultConfig();
+		// getConfig().options().copyDefaults(true);
+		// saveConfig();
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent event) {
 
 		if (event.getBlock().getType().equals(Material.CHEST)) {
-
-			Block block = event.getBlockPlaced();
 			Player player = event.getPlayer();
+			Block block = event.getBlockPlaced();
+
 			if (!block.getType().equals(Material.CHEST)) {
 				player.sendMessage("Database needs to reset");
 				return;
 			}
 			Chest chest = (Chest) block.getState();
-			List<String> list = Ba.getStringList(event.getPlayer().getName() + ".Chest");
+			// remove normal chest from the list
+			if (chest.getInventory().getName().equalsIgnoreCase("chest")
+					|| chest.getInventory().getName().equalsIgnoreCase("Large chest")) {
+				// player.sendMessage("Normal CHEST");
+				event.setCancelled(false);
+				return;
+			}
+
+			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
 
 			list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 					+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 			// Setting and saving
 			// World arena = Bukkit.getWorld("World");
 			// arena.save();
-			dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
+			dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
 
 		}
 
@@ -178,20 +184,28 @@ public class ChestLink extends JavaPlugin implements Listener {
 	public void onBlockBreak(BlockBreakEvent event) {
 
 		if (event.getBlock().getType().equals(Material.CHEST)) {
+			Chest block = (Chest) event.getBlock().getState();
+			// remove normal chest from the list
+			if (block.getInventory().getName().equalsIgnoreCase("chest")
+					|| block.getInventory().getName().equalsIgnoreCase("Large chest")) {
+				// player.sendMessage("Normal CHEST");
+				event.setCancelled(false);
+				return;
+			}
+
 			Player player = event.getPlayer();
-			// List<String> list4 = Ba.getStringList(event.getPlayer().getName()
-			// + ".Chest");
+
 			Location location = event.getBlock().getLocation();
 			int bx = location.getBlockX();
 			int by = location.getBlockY();
 			int bz = location.getBlockZ();
 			// List<String> name5 = Ba.getStringList(player.getName() +
 			// ".Chest");
-			List<String> list = Ba.getStringList(event.getPlayer().getName() + ".Chest");
+			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
 			if (list.toString() == "[]") {
 				event.setCancelled(true);
 				player.sendMessage(
-						ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + "You Don't have any Chest");
+						ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " You Don't have any Chest");
 				return;
 			}
 			if (list != null) {
@@ -213,7 +227,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 						list.remove(admin);
 
-						dConfig.SetConfig(Ba, player.getName() + ".Chest", list);
+						dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
 						// World arena = Bukkit.getWorld("World");
 						// arena.save();
 						event.setCancelled(false);
