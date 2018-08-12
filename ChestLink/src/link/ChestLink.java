@@ -77,11 +77,6 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	}
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-
-	}
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
@@ -181,6 +176,11 @@ public class ChestLink extends JavaPlugin implements Listener {
 		saveDefaultConfig();
 		// getConfig().options().copyDefaults(true);
 		// saveConfig();
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
