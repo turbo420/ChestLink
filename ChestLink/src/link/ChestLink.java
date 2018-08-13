@@ -140,7 +140,9 @@ public class ChestLink extends JavaPlugin implements Listener {
 	public void FixDataBase(Player player) {
 		if (player.hasPermission("ChestLink.FixDataBase")) {
 			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Running FixDataBase");
-			List<String> list = customConfig.getStringList(player.getName() + ".Chest");
+			List<String> list = customConfig.getStringList("Players" + "." + player.getPlayer().getName() + ".Chest");
+			// List<String> list = customConfig.getStringList(player.getName() +
+			// ".Chest");
 			for (String admin : list) {
 
 				String[] locationXYZ = admin.split(";");
@@ -204,7 +206,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 				return;
 			}
 
-			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
+			List<String> list = customConfig.getStringList("Players" + "." + event.getPlayer().getName() + ".Chest");
 			// check to see if we are not making more the 54 chests
 			if (list.size() == 54) {
 				player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA
@@ -217,7 +219,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 				list.add("ChestName:" + ";" + chest.getCustomName() + ";" + "World:" + player.getWorld().getName() + ";"
 						+ block.getX() + ";" + block.getY() + ";" + block.getZ());
 
-				dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
+				dConfig.SetConfig(customConfig, "Players" + "." + player.getName() + ".Chest", list);
 			}
 
 		}
@@ -245,7 +247,10 @@ public class ChestLink extends JavaPlugin implements Listener {
 			int bz = location.getBlockZ();
 			// List<String> name5 = Ba.getStringList(player.getName() +
 			// ".Chest");
-			List<String> list = customConfig.getStringList(event.getPlayer().getName() + ".Chest");
+			List<String> list = customConfig.getStringList("Players" + "." + event.getPlayer().getName() + ".Chest");
+			// List<String> list =
+			// customConfig.getStringList(event.getPlayer().getName() +
+			// ".Chest");
 			if (list.toString() == "[]") {
 				event.setCancelled(true);
 				player.sendMessage(
@@ -272,7 +277,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 						list.remove(admin);
 
 						// player.sendMessage(String.valueOf(list.size()));
-						dConfig.SetConfig(customConfig, player.getName() + ".Chest", list);
+						dConfig.SetConfig(customConfig, "Players" + "." + player.getName() + ".Chest", list);
 						// World arena = Bukkit.getWorld("World");
 						// arena.save();
 						event.setCancelled(false);

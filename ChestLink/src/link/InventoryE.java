@@ -34,10 +34,18 @@ public class InventoryE implements Listener {
 		return;
 	}
 
+	public void AdminRemove(Player player) {
+		// will get all players names
+		String list = plugin.customConfig.getConfigurationSection(".Players").getKeys(false).toString();
+
+		player.sendMessage(list);
+	}
+
 	public void createInventory1(Player player) {
 		///////////////////////// NEED BIG CODE
 		///////////////////////// REWORK////////////////////////////////////////////////////
-		List<String> list = plugin.customConfig.getStringList(player.getPlayer().getName() + ".Chest");
+		List<String> list = plugin.customConfig
+				.getStringList("Players" + "." + player.getPlayer().getName() + ".Chest");
 		if (list.toString() == "[]" || list.isEmpty()) {
 			// player.sendMessage("Running");
 			inv = Bukkit.createInventory(null, 9, ChatColor.RED + "ChestLink");
@@ -91,6 +99,9 @@ public class InventoryE implements Listener {
 			return;
 		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (e.getItem() != null && e.getClickedBlock() != null) {
+
+				AdminRemove(player);
+
 				// gets the tool from Config file
 				String ChestTool = plugin.getConfig().getString("ChestTool").toUpperCase();
 
@@ -121,9 +132,9 @@ public class InventoryE implements Listener {
 			return;
 		}
 		Player player = (Player) e.getPlayer();
-		// createInventory1(player);
+
 		inv.clear();
-		List<String> list = plugin.customConfig.getStringList(e.getPlayer().getName() + ".Chest");
+		List<String> list = plugin.customConfig.getStringList("Players" + "." + e.getPlayer().getName() + ".Chest");
 		for (String admin : list) {
 
 			String[] locationXYZ = admin.split(";");
@@ -199,7 +210,9 @@ public class InventoryE implements Listener {
 		if (!meta.hasDisplayName()) {
 			return;
 		}
-		List<String> list3 = plugin.customConfig.getStringList(e.getWhoClicked().getName() + ".Chest");
+
+		List<String> list3 = plugin.customConfig
+				.getStringList("Players" + "." + e.getWhoClicked().getName() + ".Chest");
 		String[] locationXYZ = list3.get(e.getSlot()).split(";");
 		int x = Integer.parseInt(locationXYZ[3]);
 		int y = Integer.parseInt(locationXYZ[4]);
