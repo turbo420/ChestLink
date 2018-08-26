@@ -38,6 +38,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 	@Override
 	public void onLoad() {
 		console = Bukkit.getServer().getConsoleSender();
+
 		console.sendMessage(ChatColor.RED + "-------------------------------");
 		console.sendMessage(ChatColor.GREEN + "----------Loading--------------");
 		console.sendMessage(ChatColor.GREEN + "---------ChestLink-------------");
@@ -56,17 +57,19 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+
 		console.sendMessage(ChatColor.RED + "-------------------------------");
 		console.sendMessage(ChatColor.GREEN + "----------ChestLink------------");
 		console.sendMessage(ChatColor.GREEN + "---------Version 1.0-----------");
 		console.sendMessage(ChatColor.RED + "-------------------------------");
 
 		inventoryE = new InventoryE(this);
+		inventoryE.loadinventory();
+
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(inventoryE, this);
 		pluginManager.registerEvents(this, this);
 
-		// inventoryE.createInventory();
 		registerConfig();
 		dConfig.ConfigMake();
 		customConfig = dConfig.LoadConfig();
@@ -141,8 +144,9 @@ public class ChestLink extends JavaPlugin implements Listener {
 		if (player.hasPermission("ChestLink.FixDataBase")) {
 			player.sendMessage(ChatColor.DARK_RED + "[ChestLink]" + ChatColor.DARK_AQUA + " Running FixDataBase");
 			List<String> list = customConfig.getStringList("Players" + "." + player.getPlayer().getName() + ".Chest");
-			// List<String> list = customConfig.getStringList(player.getName() +
-			// ".Chest");
+			if (list.isEmpty()) {
+				return;
+			}
 			for (String admin : list) {
 
 				String[] locationXYZ = admin.split(";");
@@ -160,6 +164,7 @@ public class ChestLink extends JavaPlugin implements Listener {
 
 					loc.getBlock().setType(Material.CHEST);
 					Chest c = (Chest) loc.getBlock().getState();
+					/// player.sendMessage(Chestname);
 					c.setCustomName(Chestname);
 					c.update();
 
@@ -248,9 +253,9 @@ public class ChestLink extends JavaPlugin implements Listener {
 			// List<String> name5 = Ba.getStringList(player.getName() +
 			// ".Chest");
 			List<String> list = customConfig.getStringList("Players" + "." + event.getPlayer().getName() + ".Chest");
-			// List<String> list =
-			// customConfig.getStringList(event.getPlayer().getName() +
-			// ".Chest");
+			if (list.isEmpty()) {
+				return;
+			}
 			if (list.toString() == "[]") {
 				event.setCancelled(true);
 				player.sendMessage(
